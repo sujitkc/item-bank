@@ -1,7 +1,8 @@
 import scala.io.Source
 import java.io.File
+import java.io.PrintWriter
 
-object Try {
+object MakeDB {
   def extractLabel(s : String) = {
     val l = s.length
     val pre = "%itemlabel{" 
@@ -45,24 +46,22 @@ object Try {
 
     for(directory <- itemDirs) {
       val itemFile = directory + "/item.tex"
-      println("**" + itemFile + "**")
       val labels = extractLabelsFromFile(itemFile)
-      labels.foreach(label => println(label))
       addEntries(labelItemMap, directory.getName(), labels)
     }
     labelItemMap
   }
 
-  def main(args : Array[String]) = {
-    val lines = extractLabelsFromFile("/home/sujit/IIITB/courses/resources/Python/PythonKT/item-bank/item1/item.tex")
-    lines.foreach(line => println(line))
-    val root = "/home/sujit/IIITB/courses/resources/Python/PythonKT/item-bank/"
-    val directories = getItemDirectories(root)
-    val map = allItems(root)
-    println(map)
+  def printDB(db : scala.collection.mutable.Map[String, List[String]]) = {
+    val lines = for(label <- db.keys) yield {
+      label + db(label).foldLeft("")(_ + ", " + _)
+    }
+    for(line <- lines) println(line)
   }
-}
 
-class Expression {
-
+  def main(args : Array[String]) = {
+    val root = args(0)
+    val db = allItems(root)
+    printDB(db)
+  }
 }
